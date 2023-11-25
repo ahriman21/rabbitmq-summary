@@ -43,7 +43,47 @@ def callback(ch, method, properties, body):
 channel.basic_consume(queue='q1', # the queue we created .
                       auto_ack=True, # 
                       on_message_callback=callback) # the callback function that will be executed if a message recieves.
+channel.start_consuming()
 
 ```
 
+# durability 
+to make messages and queue durable, you can add attributes while creating queue and sending messages.it means if server restarted or something like that, messages wouldn't lost.  
+```python
+# sender.py
+
+# make queue durable ==> durable=True
+channel.queue_declare(queue='q1', durable=True)
+
+# make messages durable ==> 'properties=pika.BasicProperties(delivery_mode=2,)' 2=persistent
+channel.basic_publish(...,
+                       properties=pika.BasicProperties(delivery_mode=2,)
+                     ,...)
+
+```
+
+# Message acknowledgment
+when consumer gets a message, it will send an acknowledgment to producer to delete the message from queue.  
+> if you want to do this automatically you need to set `auto_ack=True`.  
+```python
+
+channel.basic_consume(...,
+                      auto_ack=True,
+                      ...)
+```
+
+> if you don't wanna send acknowledgment automatically you need to put code below in your callback function:
+```python
+def callback(ch, method, properties,body):
+    ...
+    ch.basic_ack(delivery_tag = method.delivery_tag)
+    ...
+
+```
+
+
+# to configure your workers(consumers) in a way that each resieve messages 'one by one' and after the task done, you can put code below before basic_consume method :
+```python
+channel.basic_qos(prefetch=1)
+```
 
