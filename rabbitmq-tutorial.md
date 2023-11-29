@@ -99,7 +99,7 @@ in `basic_publish` method, the exchange parameter is the name of the exchange. T
 #### funout
 * it just broadcasts all the messages it receives to all the queues it knows.
 * when we have a exchange with the type `funout`, we don't need to define the `routing_key` in `basic_publish` method.
-* when we are using fanout type, we declare it in both producer and consumer app, but declaring queue and bindings are implemented only in consumer file
+* when we are defining a exchange manually, we declare it in both producer and consumer app, but declaring queue and bindings are implemented only in consumer file
 
 > !!! note: Compared to the fanout exchange, the direct exchange allows some filtering based on the message's routing key to determine which queue(s) receive(s) the message. With a fanout exchange, there is no such filtering and all messages go to all bound queues.  
 ## temporary queue
