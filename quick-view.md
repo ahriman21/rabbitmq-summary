@@ -127,4 +127,62 @@ channel.queue_bind(exchange='logs', # the name we chose for our exchnage
 ```
 
 
+## routing
+Routing in RabbitMQ is the process of directing messages from producers to consumers based on predefined rules. This is achieved using two key components: exchanges and routing keys. we use direct exchange to do this.
+
+*Exchanges act as message distributors, receiving messages from producers and routing them to appropriate queues based on the routing key.
+*Routing keys are arbitrary strings attached to messages by producers. Exchanges use these keys to determine which queues to send the messages to.
+
+> producer:
+```python
+# this queue sends messages that have the routing_key of 'errors'
+channel.basic_publish(exchange='direct_logs',
+                      routing_key='errors',
+                      body=message)
+
+# this queue sends messages that have the routing_key of 'infos'
+channel.basic_publish(exchange='direct_logs',
+                      routing_key='infos',
+                      body=message)
+```
+
+> consumer:
+```python
+# this queue recieves messages that have the routing_key of 'errors'
+channel.queue_bind(
+        exchange='direct_logs', queue=queue_name, routing_key='errors')
+
+# this queue recieves messages that have the routing_key of 'infos'
+channel.queue_bind(
+        exchange='direct_logs', queue=queue_name, routing_key='infos')
+
+```
+
+## topics
+In RabbitMQ, a topic exchange is a type of exchange that routes messages to queues based on a pattern matching scheme. Unlike direct exchanges, where the routing key must exactly match the binding key, topic exchanges allow for wildcard patterns in the binding key.
+
+> producer:
+```python
+# this queue sends messages that have the routing_key of '*.importants'
+channel.basic_publish(exchange='direct_logs',
+                      routing_key='*.importants',
+                      body=message)
+
+# this queue sends messages that have the routing_key of '*.notimportant'
+channel.basic_publish(exchange='direct_logs',
+                      routing_key='*.notimportant',
+                      body=message)
+```
+
+> consumer:
+```python
+# this queue recieves messages that have the routing_key of '*.importants'
+channel.queue_bind(
+        exchange='direct_logs', queue=queue_name, routing_key='*.importants')
+
+# this queue recieves messages that have the routing_key of '*.notimportant'
+channel.queue_bind(
+        exchange='direct_logs', queue=queue_name, routing_key='*.notimportant')
+
+```
 
